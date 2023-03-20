@@ -10,14 +10,14 @@ class forum:
         self.Password = Password
 
 
-def ReadInDB():
+def ReadInDB(cursor):
     forumList = []
     for row in cursor.execute("SELECT * FROM Forums"):
         forumList.append(forum(row[0], row[1], row[2], row[3]))
     return forumList
 
 
-def AddForum(URL, iconFile, list):
+def AddForum(cursor, URL, iconFile, list):
     iconBin = convertImg(iconFile)
     cursor.execute("INSERT INTO Forums (ForumURL, Icon) VALUES (?, ?)", (URL, iconBin))
     connection.commit()
@@ -25,7 +25,7 @@ def AddForum(URL, iconFile, list):
     return list
 
 
-def UpdateSecurity(URL, Username, Password, list):
+def UpdateSecurity(cursor, URL, Username, Password, list):
     cursor.execute("UPDATE Forums SET Username = ?, Password = ? WHERE ForumURL = ?", (URL, Username, Password))
     connection.commit()
     for x in list:
@@ -35,7 +35,7 @@ def UpdateSecurity(URL, Username, Password, list):
     return list
 
 
-def RemoveForum(URL, list):
+def RemoveForum(cursor, URL, list):
     cursor.execute("DELETE FROM Forums WHERE ForumURL = ?", URL)
     connection.commit()
     for i in range(len(list)):
@@ -45,7 +45,7 @@ def RemoveForum(URL, list):
     return list
 
 
-def BreakConnection():
+def BreakConnection(cursor, connection):
     for item in imageFiles:
         os.remove(item)
     if connection:
