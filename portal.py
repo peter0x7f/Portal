@@ -5,12 +5,14 @@ from PyQt5 import QtCore
 import sys
 import os
 import sqlite3
+import DatabaseInteraction
+import geticon
 
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
 else:
-    print "Error"
+    print("Error")
 
 imageFiles = []
 
