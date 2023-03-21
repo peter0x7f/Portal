@@ -1,3 +1,5 @@
+import sqlite3
+
 class forum:
     def __init__ (self, URL, Icon, Password, Username):
         self.URL = URL
@@ -8,6 +10,7 @@ class forum:
     def setSecurity(self, Username, Password):
         self.Username = Username
         self.Password = Password
+        
 
 
 def ReadInDB(cursor):
