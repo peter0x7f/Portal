@@ -15,8 +15,9 @@ def test():
         print(x)
 
     forumList = DatabaseInteraction.ReadInDB(cursor)
-    AddForum(cursor, url, forumList, connection)
-    UpdateSecurity(cursor, url, "Hello", "World", forumList, connection)
-    BreakConnection(cursor, connection)
+    DatabaseInteraction.AddForum(cursor, url, forumList, connection)
+    DatabaseInteraction.UpdateSecurity(cursor, url, "Hello", "World", forumList, connection)
+    cursor.execute("DELETE FROM Forums WHERE 'ForumURL' = (?)", (url,))
+    DatabaseInteraction.BreakConnection(cursor, connection)
     print("tested")
     print(forumList[4].URL)
