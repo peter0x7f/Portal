@@ -31,9 +31,4 @@ def download_favicon(url):
     else:
         print('Invalid website URL')
 
-if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        print('Usage: python download_favicon.py <website_url>')
-    else:
-        url = sys.argv[1]
-        download_favicon(url)
+

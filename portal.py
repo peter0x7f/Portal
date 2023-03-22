@@ -3,6 +3,18 @@ from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5 import QtCore
 import sys
+import os
+import sqlite3
+import DatabaseInteraction
+import geticon
+
+connection = sqlite3.connect("PortalDB.db")
+if connection:
+    cursor = connection.cursor()
+else:
+    print("Error")
+
+imageFiles = []
 
 class Window(QMainWindow):
     def __init__(self):
@@ -121,3 +133,4 @@ if __name__ == '__main__':
     ex = Window()
     ex.show()
     sys.exit(app.exec_())
+    
