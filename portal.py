@@ -8,14 +8,15 @@ import sqlite3
 import DatabaseInteraction
 import geticon
 
+#TG
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
 else:
     print("Error")
 
-imageFiles = []
-
+# MM
+# This code does not support dynamic numbers of forums nor icons. however it is a suitable preview of the general layout of the window and has some starter assets.
 class Window(QMainWindow):
     def __init__(self):
 
