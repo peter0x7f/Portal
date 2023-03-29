@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QInputDialog, QMessageBox
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5 import QtCore
 import sys
@@ -7,74 +7,61 @@ import os
 import sqlite3
 import DatabaseInteraction
 import geticon
+from PyQt5.QtCore import pyqtSlot
+import requests
 
-#TG
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
 else:
     print("Error")
 
-# MM
-# This code does not support dynamic numbers of forums nor icons. however it is a suitable preview of the general layout of the window and has some starter assets.
+imageFiles = []
+
 class Window(QMainWindow):
     def __init__(self):
-
         super(Window, self).__init__()
+        self.initUI()
+    def initUI(self):
+        self.tab_index = []
         self.theapp = QApplication(['', '--no-sandbox'])
         self.mainurl = QWebEngineView()
         # set the title of main window
         self.setWindowTitle('Portal')
 
         # set the size of window
-        self.Width = 800
+        self.seturl = QLineEdit()
+        self.geturl = QInputDialog()
+        self.Width = 1600
         self.height = int(0.618 * self.Width)
         self.resize(self.Width, self.height)
 
-        # add all widgets
-        self.btn_1 = QPushButton('Hackforums', self)
-        self.btn_2 = QPushButton('Bitcoin Talk', self)
-        self.btn_3 = QPushButton('Reddit', self)
-        self.btn_4 = QPushButton('+', self)
 
-        self.btn_1.clicked.connect(self.button1)
-        self.btn_2.clicked.connect(self.button2)
-        self.btn_3.clicked.connect(self.button3)
-        self.btn_4.clicked.connect(self.button4)
+        self.add_forum = QPushButton('+', self)
+        self.add_forum.clicked.connect(self.popup)
+        
+        self.left_layout = QVBoxLayout()
+        self.left_layout.addWidget(self.add_forum)
+        self.left_widget = QWidget()
+        self.left_widget.setLayout(self.left_layout)
+  
 
-        # add tabs
+        # for x, color in enumerate(self.tab_index):
+        #     self.right_widget.addTab(QWidget(), color)
+
+        # self.setCentralWidget(tabs)
         self.tab1 = self.ui1()
-        self.tab2 = self.ui2()
-        self.tab3 = self.ui3()
-        self.tab4 = self.ui4()
-
-        self.initUI()
-
-    def initUI(self):
-        left_layout = QVBoxLayout()
-        left_layout.addWidget(self.btn_1)
-        left_layout.addWidget(self.btn_2)
-        left_layout.addWidget(self.btn_3)
-        left_layout.addWidget(self.btn_4)
-        left_layout.addStretch(5)
-        left_layout.setSpacing(20)
-        left_widget = QWidget()
-        left_widget.setLayout(left_layout)
-
         self.right_widget = QTabWidget()
         self.right_widget.tabBar().setObjectName("mainTab")
 
         self.right_widget.addTab(self.tab1, '')
-        self.right_widget.addTab(self.tab2, '')
-        self.right_widget.addTab(self.tab3, '')
-        self.right_widget.addTab(self.tab4, '')
 
         self.right_widget.setCurrentIndex(0)
         self.right_widget.setStyleSheet('''QTabBar::tab{width: 0; \
             height: 0; margin: 0; padding: 0; border: none;}''')
-
+        #fix layout feature
         main_layout = QHBoxLayout()
-        main_layout.addWidget(left_widget)
+        main_layout.addWidget(self.left_widget)
         main_layout.addWidget(self.right_widget)
         main_layout.setStretch(0, 40)
         main_layout.setStretch(1, 200)
@@ -82,52 +69,62 @@ class Window(QMainWindow):
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
 
-    # ----------------- 
-    # buttons
-
-    def button1(self):
-        self.right_widget.setCurrentIndex(0)
-
-    def button2(self):
-        self.right_widget.setCurrentIndex(1)
-
-    def button3(self):
-        self.right_widget.setCurrentIndex(2)
-
-    def button4(self):
-        self.right_widget.setCurrentIndex(3)
-
-    # ----------------- 
-    # pages
-
     def ui1(self):
+        self.text = QLabel("hello portal users")
+
+    def ui2(self, url):
         main_layout = QVBoxLayout()
-        self.mainurl.load(QtCore.QUrl(f"https://hackforums.com"))
+        self.mainurl.load(QtCore.QUrl())
         self.mainurl.setLayout(main_layout)
         return self.mainurl
+    
+    def popup(self):
+        urldialog, ok = self.geturl.getText(self, "Add Forum","Enter Url:")
+        if ok:
+            self.seturl.setText(urldialog)
+            self.url_parse(self.seturl.text())
+    
+    @pyqtSlot()
+    def url_parse(self, urlval):
 
-    def ui2(self):
-        main_layout = QVBoxLayout()
-        self.mainurl.load(QtCore.QUrl(f"https://bitcointalk.org/"))
-        self.mainurl.setLayout(main_layout)
-        return self.mainurl
+        name = urlval
+        url = urlval 
 
-    def ui3(self):
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(QLabel('https://reddit.com'))
-        main_layout.addStretch(5)
-        main = QWidget()
-        main.setLayout(main_layout)
-        return main
+        #checks if http to convert to https
+        if "http://" in url:
+            url = url.replace("http://","https://")
+            name = url
 
-    def ui4(self):
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(QLabel('+'))
-        main_layout.addStretch(5)
-        main = QWidget()
-        main.setLayout(main_layout)
-        return main
+        #checks if user entered https instead and if not adds it to their url
+        elif "https://" not in url:
+            url = "https://"+url
+            name = url
 
+        #includes relavant headers 
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+        }
+        #check if url is valid
+        try:
+            response = requests.get(url, headers=headers)
+            response.close()
+            #parses input for name
+            name = name.split('.')
+            if "https://www" in name[0]:
+                name = name[1]
+            else:
+                name = name[0].split('://')
+                name = name[1][:]
+            print(name)
+            print(url)
+        except:
+            #alert user they entered invalid input
+            msg = QMessageBox()
+            msg.setWindowTitle("Invalid input")
+            msg.setText("The URL you entered is invalid, please try again.")
+            x = msg.exec_()
+
+ 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
