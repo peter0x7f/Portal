@@ -82,7 +82,8 @@ class Window(QMainWindow):
         if ok:
             self.seturl.setText(urldialog)
             self.url_parse(self.seturl.text())
-
+            
+    #dynamically sets button name and sets to params defined in ui2
     def create_button(self, name, url):
                 self.tab_name.append(name)
                 self.tab_link.append(url)
