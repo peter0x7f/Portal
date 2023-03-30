@@ -23,7 +23,8 @@ class Window(QMainWindow):
         super(Window, self).__init__()
         self.initUI()
     def initUI(self):
-        self.tab_index = []
+        self.tab_name = []
+        self.tab_link = []
         self.theapp = QApplication(['', '--no-sandbox'])
         self.mainurl = QWebEngineView()
         # set the title of main window
@@ -38,6 +39,7 @@ class Window(QMainWindow):
 
 
         self.add_forum = QPushButton('+', self)
+        self.add_forum.move(0, int(0.618 * self.Width))
         self.add_forum.clicked.connect(self.popup)
         
         self.left_layout = QVBoxLayout()
@@ -45,11 +47,9 @@ class Window(QMainWindow):
         self.left_widget = QWidget()
         self.left_widget.setLayout(self.left_layout)
   
+        # for x in range(len(self.tab_)):
+        #     self.right_widget.addTab(QWidget(), self.tab_index[x][0])
 
-        # for x, color in enumerate(self.tab_index):
-        #     self.right_widget.addTab(QWidget(), color)
-
-        # self.setCentralWidget(tabs)
         self.tab1 = self.ui1()
         self.right_widget = QTabWidget()
         self.right_widget.tabBar().setObjectName("mainTab")
@@ -70,12 +70,11 @@ class Window(QMainWindow):
         self.setCentralWidget(main_widget)
 
     def ui1(self):
-        self.text = QLabel("hello portal users")
+        self.mainurl.setUrl(QtCore.QUrl(f'https://reddit.com'))
+        return self.mainurl
 
     def ui2(self, url):
-        main_layout = QVBoxLayout()
-        self.mainurl.load(QtCore.QUrl())
-        self.mainurl.setLayout(main_layout)
+        self.mainurl.setUrl(QtCore.QUrl(f'{url}'))
         return self.mainurl
     
     def popup(self):
@@ -83,7 +82,15 @@ class Window(QMainWindow):
         if ok:
             self.seturl.setText(urldialog)
             self.url_parse(self.seturl.text())
-    
+
+    def create_button(self, name, url):
+                self.tab_name.append(name)
+                self.tab_link.append(url)
+                self.temp = len(self.tab_name)
+                globals()[f'{name}'] = QPushButton(name, self)
+                self.left_layout.addWidget(globals()[f'{name}'])
+                globals()[f'{name}'].clicked.connect(lambda: self.ui2(url))
+                
     @pyqtSlot()
     def url_parse(self, urlval):
 
@@ -107,16 +114,16 @@ class Window(QMainWindow):
         #check if url is valid
         try:
             response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                #parses input for name
+                name = name.split('.')
+                if "https://www" in name[0]:
+                    name = name[1]
+                else:
+                    name = name[0].split('://')
+                    name = name[1][:]
+                self.create_button(name, url)
             response.close()
-            #parses input for name
-            name = name.split('.')
-            if "https://www" in name[0]:
-                name = name[1]
-            else:
-                name = name[0].split('://')
-                name = name[1][:]
-            print(name)
-            print(url)
         except:
             #alert user they entered invalid input
             msg = QMessageBox()
