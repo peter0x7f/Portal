@@ -89,6 +89,9 @@ class Window(QMainWindow):
                 self.tab_link.append(url)
                 self.temp = len(self.tab_name)
                 globals()[f'{name}'] = QPushButton(name, self)
+                globals()[f'{name}'].setStyleSheet("border-radius : 25; border : 2px solid black")
+                button.setIcon(QIcon('Icons/Default.ico'))
+                button.setIconSize(QSize(50, 50))
                 self.left_layout.addWidget(globals()[f'{name}'])
                 globals()[f'{name}'].clicked.connect(lambda: self.ui2(url))
                 
