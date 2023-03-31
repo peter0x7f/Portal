@@ -25,7 +25,7 @@ def download_favicon(url, name):
             response = requests.get(icon_url, headers=headers, stream=True)
             #checks if ico link is valid
             if response.status_code == 200:
-                icon_file = os.getcwd() + "/images/" + name + '.ico'
+                icon_file = os.getcwd() + "/Icons/" + name + '.ico'
                 #writes content to file
                 with open(icon_file, 'wb') as f:
                     for chunk in response.iter_content(1024):
@@ -35,11 +35,11 @@ def download_favicon(url, name):
             else:
                 #sets icon to default
                 print('Failed to download favicon')
-                return os.path.getcwd()+"/images/"+"default.ico"
+                return os.path.getcwd()+"/Icons/"+"default.ico"
         else:
             print('Favicon not found')
-            return os.path.getcwd()+"/images/"+"default.ico"
+            return os.path.getcwd()+"/Icons/"+"default.ico"
     else:
         print('Invalid website URL')
-        return os.path.getcwd()+"/images/"+"default.ico"
+        return os.path.getcwd()+"/Icons/"+"default.ico"
     response.close()
