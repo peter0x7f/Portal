@@ -15,21 +15,10 @@ import geticon
 
 class forum:
 
-    def __init__(self, URL, Icon, Password, Username):
-        if (Password == ""):
-            noPass(self, URL, Icon)
-        else:
-            withPass(self, URL, Icon, Password, Username)
-    
-    def noPass(self, URL, Icon):
+    def __init__(self, URL, Icon, Title):
         self.URL = URL
         self.icon = Icon
-        
-    def withPass(self, URL, Icon, Password, Username):
-        self.URL = URL
-        self.icon = Icon
-        self.Username = Username
-        self.Password = Password
+        self.title = Title
         
     def setSecurity(self, Username, Password):
         self.Username = Username
@@ -69,16 +58,18 @@ def UpdateSecurity(cursor, URL, Username, Password, list, connection):
     return list
 
 
-def RemoveForum(cursor, URL, list, connection):
+def RemoveForum(cursor, URL, ls, connection):
     cursor.execute("SELECT 'Icon' FROM 'Forums' WHERE 'ForumsURL' = ?", URL)
     file = cursor.fetchall()
     os.remove(file)
     cursor.execute("DELETE FROM 'Forums' WHERE 'ForumURL' = ?", URL)
     connection.commit()
     
-    for i in range(len(list)):
-        if list[i].URL == URL:
-            list.remove(i)
+    ls.remove(i)
+    
+    for i in range(len(ls)):
+        if ls[i].URL == URL:
+            ls.remove(i)
             break
     return list
 
