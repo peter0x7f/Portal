@@ -43,14 +43,6 @@ class forum:
         #else:
         #    withPass(self, URL, Icon, Password, Username)
 
-
-def FindForums(cursor):
-    allForumsFound = ScrapeForums()
-    sites = [(s, ) for s in links]
-    for item in sites:
-        cursor.execute("INSERT INTO AllForums (URL) VALUES (?)", item)
-
-
 def ReadInDB(cursor):
     forumList = []
 
