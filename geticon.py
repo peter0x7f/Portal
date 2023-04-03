@@ -31,15 +31,19 @@ def download_favicon(url, name):
                     for chunk in response.iter_content(1024):
                         f.write(chunk)
                 print('Favicon downloaded successfully')
-                return os.getcwd() + "/" + name + '.ico'
+                #return os.getcwd() + "/Icons/" + name + '.png'
+                return "Icons/" + name + 'png'
             else:
                 #sets icon to default
                 print('Failed to download favicon')
-                return os.path.getcwd()+"/Icons/"+"default.ico"
+                return "Icons/Default.png"
+                #return os.path.getcwd() + "Icons/Default.png"
         else:
             print('Favicon not found')
-            return os.path.getcwd()+"/Icons/"+"default.ico"
+            return "Icons/Default.png"
+            #return os.path.getcwd() + "Icons/Default.png"
     else:
         print('Invalid website URL')
-        return os.path.getcwd()+"/Icons/"+"default.ico"
+        #return os.path.getcwd() + "Icons/Default.png"
+        return "Icons/Default.png"
     response.close()
