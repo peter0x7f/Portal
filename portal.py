@@ -14,9 +14,10 @@ connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
 else:
-    print("Error")
-
-imageFiles = []
+    msg = QMessageBox()
+    msg.setWindowTitle("Database Error")
+    msg.setText("Unable to connect with the database.")
+    x = msg.exec_()
 
 class Window(QMainWindow):
     def __init__(self):
@@ -85,13 +86,15 @@ class Window(QMainWindow):
             
     #dynamically sets button name and sets to params defined in ui2
     def create_button(self, name, url):
+                path = GetIcon.download_favicon(url, name)
+                DatabaseInteraction.AddForum(cursor, url, path, name, ls, connection)
                 self.tab_name.append(name)
                 self.tab_link.append(url)
                 self.temp = len(self.tab_name)
                 globals()[f'{name}'] = QPushButton(name, self)
-                globals()[f'{name}'].setStyleSheet("border-radius : 25; border : 2px solid black")
-                button.setIcon(QIcon('Icons/Default.ico'))
-                button.setIconSize(QSize(50, 50))
+                globals()[f'{name}'].setStyleSheet("border-radius : 25; border : 0px solid black")
+                globals()[f'{name}'].setIcon(QIcon(path))
+                globals()[f'{name}'].setIconSize(QSize(50, 50))
                 self.left_layout.addWidget(globals()[f'{name}'])
                 globals()[f'{name}'].clicked.connect(lambda: self.ui2(url))
                 
