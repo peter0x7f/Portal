@@ -32,7 +32,7 @@ def download_favicon(url, name):
                         f.write(chunk)
                 print('Favicon downloaded successfully')
                 #return os.getcwd() + "/Icons/" + name + '.png'
-                return "Icons/" + name + 'png'
+                return "Icons/" + name + '.ico'
             else:
                 #sets icon to default
                 print('Failed to download favicon')
