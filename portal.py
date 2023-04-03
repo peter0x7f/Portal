@@ -6,8 +6,11 @@ import sys
 import os
 import sqlite3
 import DatabaseInteraction
-import geticon
-from PyQt5.QtCore import pyqtSlot
+import GetIcon
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+#from PyQt5.QtCore import pyqtSlot
 import requests
 
 connection = sqlite3.connect("PortalDB.db")
@@ -19,10 +22,14 @@ else:
     msg.setText("Unable to connect with the database.")
     x = msg.exec_()
 
+
 class Window(QMainWindow):
+
     def __init__(self):
         super(Window, self).__init__()
+        self.forumList = DatabaseInteraction.ReadInDB(cursor)
         self.initUI()
+
     def initUI(self):
         self.tab_name = []
         self.tab_link = []
@@ -38,16 +45,15 @@ class Window(QMainWindow):
         self.height = int(0.618 * self.Width)
         self.resize(self.Width, self.height)
 
-
         self.add_forum = QPushButton('+', self)
         self.add_forum.move(0, int(0.618 * self.Width))
         self.add_forum.clicked.connect(self.popup)
-        
+
         self.left_layout = QVBoxLayout()
         self.left_layout.addWidget(self.add_forum)
         self.left_widget = QWidget()
         self.left_widget.setLayout(self.left_layout)
-  
+
         # for x in range(len(self.tab_)):
         #     self.right_widget.addTab(QWidget(), self.tab_index[x][0])
 
@@ -69,6 +75,7 @@ class Window(QMainWindow):
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
+        self.create_button("reddit", "https://reddit.com")
 
     def ui1(self):
         self.mainurl.setUrl(QtCore.QUrl(f'https://reddit.com'))
@@ -77,46 +84,49 @@ class Window(QMainWindow):
     def ui2(self, url):
         self.mainurl.setUrl(QtCore.QUrl(f'{url}'))
         return self.mainurl
-    
+
     def popup(self):
-        urldialog, ok = self.geturl.getText(self, "Add Forum","Enter Url:")
+        urldialog, ok = self.geturl.getText(self, "Add Forum", "Enter Url:")
         if ok:
             self.seturl.setText(urldialog)
             self.url_parse(self.seturl.text())
-            
+
     #dynamically sets button name and sets to params defined in ui2
     def create_button(self, name, url):
-                path = GetIcon.download_favicon(url, name)
-                DatabaseInteraction.AddForum(cursor, url, path, name, ls, connection)
-                self.tab_name.append(name)
-                self.tab_link.append(url)
-                self.temp = len(self.tab_name)
-                globals()[f'{name}'] = QPushButton(name, self)
-                globals()[f'{name}'].setStyleSheet("border-radius : 25; border : 0px solid black")
-                globals()[f'{name}'].setIcon(QIcon(path))
-                globals()[f'{name}'].setIconSize(QSize(50, 50))
-                self.left_layout.addWidget(globals()[f'{name}'])
-                globals()[f'{name}'].clicked.connect(lambda: self.ui2(url))
-                
+        path = GetIcon.download_favicon(url, name)
+        DatabaseInteraction.AddForum(cursor, url, path, name, self.forumList,
+                                     connection)
+        self.tab_name.append(name)
+        self.tab_link.append(url)
+        self.temp = len(self.tab_name)
+        globals()[f'{name}'] = QPushButton(name, self)
+        globals()[f'{name}'].setStyleSheet(
+            "border-radius : 25; border : 0px solid black")
+        globals()[f'{name}'].setIcon(QIcon(path))
+        globals()[f'{name}'].setIconSize(QSize(50, 50))
+        self.left_layout.addWidget(globals()[f'{name}'])
+        globals()[f'{name}'].clicked.connect(lambda: self.ui2(url))
+
     @pyqtSlot()
     def url_parse(self, urlval):
 
         name = urlval
-        url = urlval 
+        url = urlval
 
         #checks if http to convert to https
         if "http://" in url:
-            url = url.replace("http://","https://")
+            url = url.replace("http://", "https://")
             name = url
 
         #checks if user entered https instead and if not adds it to their url
         elif "https://" not in url:
-            url = "https://"+url
+            url = "https://" + url
             name = url
 
-        #includes relavant headers 
+        #includes relavant headers
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
         }
         #check if url is valid
         try:
@@ -138,11 +148,9 @@ class Window(QMainWindow):
             msg.setText("The URL you entered is invalid, please try again.")
             x = msg.exec_()
 
- 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = Window()
     ex.show()
     sys.exit(app.exec_())
-    
