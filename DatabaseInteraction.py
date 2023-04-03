@@ -1,6 +1,6 @@
 import sqlite3
 import os
-import geticon
+import GetIcon
 
 #                       Database Structure                             #
 #                             Forums                                   #
@@ -43,6 +43,14 @@ class forum:
         #else:
         #    withPass(self, URL, Icon, Password, Username)
 
+
+def FindForums(cursor):
+    allForumsFound = ScrapeForums()
+    sites = [(s, ) for s in links]
+    for item in sites:
+        cursor.execute("INSERT INTO AllForums (URL) VALUES (?)", item)
+
+
 def ReadInDB(cursor):
     forumList = []
 
@@ -54,12 +62,15 @@ def ReadInDB(cursor):
 
 
 def AddForum(cursor, URL, path, name, ls, connection):
-    cursor.execute(
-        "INSERT INTO Forums (ForumURL, Icon, Name) VALUES (?, ?, ?)",
-        (URL, path, name))
-    connection.commit()
+    cursor.execute("SELECT * FROM 'Forums' WHERE 'ForumURL' = ?", (URL, ))
+    output = cursor.fetchall()
+    if len(output) == 0:
+        cursor.execute(
+            "INSERT INTO Forums (ForumURL, Icon, Name) VALUES (?, ?, ?)",
+            (URL, path, name))
+        connection.commit()
 
-    ls.append(forum(URL, path, "", "", name))
+        ls.append(forum(URL, path, "", "", name))
     return ls
 
 
