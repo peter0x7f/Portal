@@ -3,6 +3,7 @@ import requests
 import os
 import os.path
 from bs4 import BeautifulSoup
+from PIL import Image
 
 def download_favicon(url, name):
     #includes relavant headers 
@@ -31,8 +32,11 @@ def download_favicon(url, name):
                     for chunk in response.iter_content(1024):
                         f.write(chunk)
                 print('Favicon downloaded successfully')
-                #return os.getcwd() + "/Icons/" + name + '.png'
-                return "Icons/" + name + '.ico'
+                im = Image.open(icon_file)
+                new_im = im.resize((150,150))
+                new_im.save(icon_file)
+                return icon_file
+
             else:
                 #sets icon to default
                 print('Failed to download favicon')
