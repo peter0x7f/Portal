@@ -21,8 +21,8 @@ else:
     msg.setWindowTitle("Database Error")
     msg.setText("Unable to connect with the database.")
     x = msg.exec_()
- 
-#set arrays global to be accessed from other classes without making removeItem child 
+  
+ #set arrays global to be accessed from other classes without making removeItem child 
 global tab_name 
 global tab_link
 tab_name = []
@@ -50,8 +50,6 @@ class removeItem(QMainWindow):
         self.combo_box.setGeometry(200, 150, 120, 30)
  
         # adding list of items to combo box
-        self.combo_box.addItems(tab_name)
- 
         # creating push button
         self.submit = QPushButton("submit", self)
  
@@ -61,13 +59,15 @@ class removeItem(QMainWindow):
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
+        print(self.con)
     def pressed(self):
         if self.con == 0:
             self.main = Window()
             self.con =+ 1
         self.content = self.combo_box.currentText()
         self.main.removewidget(self.content)
-        self.close()
+        self.combo_box.clear()
+        self.hide()
         
        
 
@@ -143,6 +143,7 @@ class Window(QMainWindow):
             if self.con == 0:
                 self.thewindow=removeItem()
                 self.con=+1
+            self.thewindow.combo_box.addItems(tab_name)
             self.thewindow.show()
         else:
             msg = QMessageBox()
