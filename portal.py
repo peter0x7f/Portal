@@ -142,7 +142,7 @@ class Window(QMainWindow):
         #   for x in range(len(self.tab_name)):
         #     create_button(dbs entries)
 
-        self.tab1 = self.ui1()
+        self.tab1 = self.ui1('https://reddit.com/login')
         self.right_widget = QTabWidget()
         self.right_widget.tabBar().setObjectName("mainTab")
 
@@ -161,8 +161,8 @@ class Window(QMainWindow):
         self.setCentralWidget(main_widget)
         self.startup_buttons()
 
-    def ui1(self):
-        self.mainurl.setUrl(QtCore.QUrl(f'https://reddit.com/login'))
+    def ui1(self, url):
+        self.mainurl.setUrl(QtCore.QUrl(f'{url}'))
         return self.mainurl
 
     def popup(self):
@@ -203,7 +203,7 @@ class Window(QMainWindow):
         globals()[f'{name}'].setIcon(QIcon(path))
         globals()[f'{name}'].setIconSize(QSize(50, 50))
         self.left_layout.addWidget(globals()[f'{name}'])
-        globals()[f'{name}'].clicked.connect(lambda: self.ui2(url))
+        globals()[f'{name}'].clicked.connect(lambda: self.ui1(url))
 
     @pyqtSlot()
     def url_parse(self, urlval):
