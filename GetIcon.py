@@ -5,14 +5,16 @@ import os.path
 from bs4 import BeautifulSoup
 from PIL import Image
 
+
 def download_favicon(url, name):
-    #includes relavant headers 
+    #includes relavant headers
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+        'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
     #gets response
     response = requests.get(url, headers=headers)
-    #double checks that 
+    #double checks that
     if response.status_code == 200:
         if os.path.isfile(os.getcwd() + "/Icons/" + name + '.ico'):
             return "Icons/" + name + '.ico'
@@ -35,7 +37,7 @@ def download_favicon(url, name):
                         f.write(chunk)
                 print('Favicon downloaded successfully')
                 im = Image.open(icon_file)
-                new_im = im.resize((150,150))
+                new_im = im.resize((150, 150))
                 new_im.save(icon_file)
                 return icon_file
 
