@@ -262,12 +262,14 @@ class Window(QMainWindow):
             x = msg.exec_()
 
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    atexit.register(app.deleteLater)
     ex = Window()
     atexit.register(DatabaseInteraction.BreakConnection, cursor, connection)
     ex.show()
     sys.exit(app.exec_())
-    atexit.register(ex.mainurl.close)
-    atexit.register(ex.close)
+    atexit.register(ex.deleteLater)
     atexit.register(os.exit)
+    sys.exit()
