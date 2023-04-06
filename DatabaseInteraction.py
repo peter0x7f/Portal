@@ -61,7 +61,7 @@ def ReadInDB(cursor):
     return forumList
 
 
-def AddForum(cursor, URL, path, name, ls, connection):
+def AddForum(cursor, URL, path, name, connection):
     cursor.execute("SELECT * FROM 'Forums' WHERE 'ForumURL' = ?", (URL, ))
     output = cursor.fetchall()
     if len(output) == 0:
@@ -70,23 +70,15 @@ def AddForum(cursor, URL, path, name, ls, connection):
             (URL, path, name))
         connection.commit()
 
-        ls.append(forum(URL, path, "", "", name))
-    return ls
 
-
-def UpdateSecurity(cursor, URL, Username, Password, ls, connection):
+def UpdateSecurity(cursor, URL, Username, Password, connection):
     cursor.execute(
         "UPDATE Forums SET Username = ?, Password = ? WHERE ForumURL = ?",
         (URL, Username, Password))
     connection.commit()
-    for x in ls:
-        if x.URL == URL:
-            x.setSecurity(Username, Password)
-            break
-    return ls
 
 
-def RemoveForum(cursor, URL, ls, connection):
+def RemoveForum(cursor, URL, connection):
     cursor.execute("SELECT 'Icon' FROM 'Forums' WHERE 'ForumsURL' = (?)",
                    (URL, ))
     file = cursor.fetchall()
@@ -95,9 +87,6 @@ def RemoveForum(cursor, URL, ls, connection):
             os.remove(file[0])
     cursor.execute("DELETE FROM 'Forums' WHERE ForumURL = ?", (URL, ))
     connection.commit()
-    if URL in ls:
-        ls.remove(URL)
-    return ls
 
 
 def BreakConnection(cursor, connection):
