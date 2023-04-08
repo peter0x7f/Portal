@@ -1,42 +1,26 @@
+
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QVBoxLayout,QHBoxLayout, QInputDialog, QMessageBox
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5 import QtCore
 import sys
-import os
-import sqlite3
-import DatabaseInteraction
-import GetIcon
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-#from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 import requests
-import atexit
+# from geticon import download_favicon
+from PyQt5.QtGui import *
 
-connection = sqlite3.connect("PortalDB.db")
-if connection:
-    cursor = connection.cursor()
-else:
-    msg = QMessageBox()
-    msg.setWindowTitle("Database Error")
-    msg.setText("Unable to connect with the database.")
-    x = msg.exec_()
-
-#set arrays global to be accessed from other classes without making removeItem child
-global tab_name
+#set arrays global to be accessed from other classes without making removeItem child 
+global tab_name 
 global tab_link
-global tab_icon
 tab_name = []
 tab_link = []
-tab_icon = []
+
 
 
 class removeItem(QMainWindow):
-
     def __init__(self):
         super(removeItem, self).__init__()
-
+ 
         # setting title
         self.setWindowTitle("Manage")
         self.con = 0
@@ -44,37 +28,36 @@ class removeItem(QMainWindow):
         self.setGeometry(100, 100, 600, 400)
         # calling method
         self.UiComponents()
-
+ 
     # method for widgets
     def UiComponents(self):
         # creating a combo box widget
         self.combo_box = QComboBox(self)
-
+ 
         # setting geometry of combo box
         self.combo_box.setGeometry(200, 150, 120, 30)
-
+ 
         # adding list of items to combo box
         # creating push button
         self.submit = QPushButton("submit", self)
-
+ 
         print(self.combo_box.count())
-
+ 
         # adding action to button
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
         print(self.con)
-
     def pressed(self):
         if self.con == 0:
             self.main = Window()
-            self.con = +1
+            self.con =+ 1
         self.content = self.combo_box.currentText()
         self.main.removewidget(self.content)
         self.combo_box.clear()
         self.hide()
         
-class forumlist(QMainWindow):
+class forumlist(QWidget):
     def __init__(self):
         super(forumlist, self).__init__()
  
@@ -113,14 +96,14 @@ class forumlist(QMainWindow):
             self.con =+ 1
         self.content = self.combo_box.currentText()
         self.forum_list.remove(self.content)
-        self.main.url_parse(self.content)
-        self.hide()     
+        self.main.pass_args(self.content)
+        self.hide()      
 
 class Window(QMainWindow):
-
     def __init__(self):
         super(Window, self).__init__()
         self.con = 0
+        self.con1 = 0
         self.initUI()
 
     def initUI(self):
@@ -137,44 +120,21 @@ class Window(QMainWindow):
         self.height = int(0.618 * self.Width)
         self.resize(self.Width, self.height)
 
+
+        self.add_forum = QPushButton('+', self)
+        self.add_forum.clicked.connect(self.popup)
+        self.search_forum = QPushButton('search', self)
+        self.search_forum.clicked.connect(self.forums)
+        self.rem_forum = QPushButton('-', self)
+        self.rem_forum.clicked.connect(self.delet)
+        self.rem_forum.clicked.connect(self.ui1)
+
         self.left_layout = QVBoxLayout()
-        self.left_layout.setAlignment(Qt.AlignTop)
-        self.left_layout.setSpacing(30)
-
-        self.uiBox = QHBoxLayout()
-
-        self.addButton = QPushButton("", self)
-        self.addButton.setIcon(QIcon("UI_Icons/AddButton.png"))
-        self.addButton.setIconSize(QSize(30, 30))
-        self.addButton.setStyleSheet(
-            "border-radius : 15; border : 0px solid black")
-        self.addButton.clicked.connect(self.popup)
-        self.minusButton = QPushButton("", self)
-        self.minusButton.setIcon(QIcon("UI_Icons/MinusButton.png"))
-        self.minusButton.setIconSize(QSize(35, 35))
-        self.minusButton.setStyleSheet(
-            "border-radius : 15; border : 0px solid black")
-        self.minusButton.clicked.connect(self.delet)
-        self.minusButton.clicked.connect(self.ui1)
-
-        self.searchButton = QPushButton("", self)
-        self.searchButton.setIcon(QIcon("UI_Icons/SearchButton.png"))
-        self.searchButton.setIconSize(QSize(30, 30))
-        self.searchButton.setStyleSheet(
-            "border-radius : 15; border : 0px solid black")
-
-        #self.left_layout.addWidget(b3)
-        self.uiBox.addWidget(self.addButton)
-        self.uiBox.addWidget(self.minusButton)
-        self.uiBox.addWidget(self.searchButton)
-
-        self.left_layout.addLayout(self.uiBox)
+        self.left_layout.addWidget(self.add_forum)
+        self.left_layout.addWidget(self.rem_forum)
+        self.left_layout.addWidget(self.search_forum)
         self.left_widget = QWidget()
         self.left_widget.setLayout(self.left_layout)
-        #if array empty:
-        #populate array with db values
-        #   for x in range(len(self.tab_name)):
-        #     create_button(dbs entries)
 
         self.tab1 = self.ui1()
         self.right_widget = QTabWidget()
@@ -193,20 +153,17 @@ class Window(QMainWindow):
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
-        if len(tab_link) == 0 and len(tab_name) == 0:
-            forumList = DatabaseInteraction.ReadInDB(cursor)
-            for item in forumList:
-                self.create_button(item.name, item.URL, 1)
+        #if tab_link empty:
+        #populate tab_link and tab_name with db values
+        #   for x in range(len(tab_name)):
+        #     create_button(dbs entries)
 
     def ui1(self):
-        #self.mainurl.setUrl(QtCore.QUrl(f'https://reddit.com/login'))
-        #self.mainurl.setUrl(QtCore.QUrl(f'Home.html'))
-        self.mainurl.load(QtCore.QUrl.fromLocalFile(os.getcwd() +
-                                                    '/Home.html'))
+        self.mainurl.setUrl(QtCore.QUrl(f'https://reddit.com/login'))
         return self.mainurl
-
+    
     def popup(self):
-        urldialog, ok = self.geturl.getText(self, "Add Forum", "Enter Url:")
+        urldialog, ok = self.geturl.getText(self, "Add Forum","Enter Url:")
         if ok:
             self.seturl.setText(urldialog)
             self.url_parse(self.seturl.text())
@@ -215,8 +172,8 @@ class Window(QMainWindow):
         print(tab_name)
         if len(tab_name) >= 1:
             if self.con == 0:
-                self.thewindow = removeItem()
-                self.con = +1
+                self.thewindow=removeItem()
+                self.con=+1
             self.thewindow.combo_box.addItems(tab_name)
             self.thewindow.show()
         else:
@@ -225,60 +182,56 @@ class Window(QMainWindow):
             msg.setText("You have nothing to manage yet")
             x = msg.exec_()
 
-    def removewidget(self, name):
-        ind = tab_name.index(name)
-
-        DatabaseInteraction.RemoveForum(cursor, tab_link[ind], connection)
-        tab_name.pop(ind)
-        tab_link.pop(ind)
-        tab_icon.pop(ind)
-        name = globals()[f'{name}']
-        name.deleteLater()
-        
     def forums(self):
         if self.con1 == 0:
             self.thewind=forumlist()
             self.con1=+1
         self.thewind.show()
 
-    def create_button(self, name, url, action):
-        path = GetIcon.download_favicon(url, name)
-        if action == 0:
-            DatabaseInteraction.AddForum(cursor, url, path, name, connection)
+    def pass_args(self, content):
+        self.url_parse(content)
 
-        tab_name.append(name.lower())
-        tab_link.append(url.lower())
-        tab_icon.append(path)
-        self.temp = len(tab_name)
+
+    def removewidget(self, name):
+        ind = tab_name.index(name)
+        tab_name.pop(ind)
+        tab_link.pop(ind)
+        name = globals()[f'{name}']
+        name.deleteLater()
+        
+
+    def create_button(self, name, url):
+        try:
+            download_favicon(url, name)
+        except:
+            print("..")
+        tab_name.append(name)
+        tab_link.append(url)
+        print(tab_name)
         globals()[f'{name}'] = QPushButton(name, self)
-        globals()[f'{name}'].setStyleSheet(
-            "border-radius : 25; border : 0px solid black")
-        globals()[f'{name}'].setIcon(QIcon(path))
-        globals()[f'{name}'].setIconSize(QSize(50, 50))
         self.left_layout.addWidget(globals()[f'{name}'])
-        globals()[f'{name}'].clicked.connect(
-            lambda: self.mainurl.setUrl(QtCore.QUrl(f'{url}')))
-
+        globals()[f'{name}'].clicked.connect(lambda: self.mainurl.setUrl(QtCore.QUrl(f'{url}')))
+        print(globals()[f'{name}'])
+                
     @pyqtSlot()
     def url_parse(self, urlval):
 
         name = urlval
-        url = urlval
+        url = urlval 
 
         #checks if http to convert to https
         if "http://" in url:
-            url = url.replace("http://", "https://")
+            url = url.replace("http://","https://")
             name = url
 
         #checks if user entered https instead and if not adds it to their url
         elif "https://" not in url:
-            url = "https://" + url
+            url = "https://"+url
             name = url
 
-        #includes relavant headers
+        #includes relavant headers 
         headers = {
-            'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
         }
         #check if url is valid
         try:
@@ -294,8 +247,8 @@ class Window(QMainWindow):
                     name = name[1][:]
                 #call create button class
             response.close()
-            if url not in tab_link or url.lower() not in tab_link:
-                self.create_button(name, url, 0)
+            if url not in tab_link:
+                self.create_button(name, url)
             else:
                 msg = QMessageBox()
                 msg.setWindowTitle("Invalid input")
@@ -308,15 +261,10 @@ class Window(QMainWindow):
             msg.setText("The URL you entered is invalid, please try again.")
             x = msg.exec_()
 
-
+ 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    atexit.register(app.deleteLater)
     ex = Window()
-    atexit.register(DatabaseInteraction.BreakConnection, cursor, connection)
     ex.show()
     sys.exit(app.exec_())
-    atexit.register(ex.deleteLater)
-    atexit.register(os.exit)
-    sys.exit()
