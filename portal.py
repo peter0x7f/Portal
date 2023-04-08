@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QInputDialog, QMessageBox
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5 import QtCore
 import sys
@@ -10,7 +9,6 @@ import GetIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-#from PyQt5.QtCore import pyqtSlot
 import requests
 import atexit
 
@@ -73,13 +71,55 @@ class removeItem(QMainWindow):
         self.main.removewidget(self.content)
         self.combo_box.clear()
         self.hide()
-
+        
+class forumlist(QMainWindow):
+    def __init__(self):
+        super(forumlist, self).__init__()
+ 
+        # setting title
+        self.setWindowTitle("Forum List")
+        self.con = 0
+        # setting geometry
+        self.setGeometry(100, 100, 600, 400)
+        # calling method
+        self.UiComponents()
+ 
+    # method for widgets
+    def UiComponents(self):
+        # creating a combo box widget
+        self.combo_box = QComboBox(self)
+ 
+        # setting geometry of combo box
+        self.combo_box.setGeometry(200, 150, 120, 30)
+ 
+        # adding list of items to combo box
+        self.forum_list = ["https://www.reddit.com/","https://forums.craigslist.org/","https://www.quora.com/","http://stackoverflow.com/","https://gamefaqs.gamespot.com/","http://tianya.cn/","http://ign.com/boards","http://4chan.org/","https://www.ultimate-guitar.com/","https://www.xda-developers.com/","https://hackforums.net/","https://darkode.market/","http://slickdeals.net/","http://www.kaskus.co.id/","http://arstechnica.com/","https://bodybuilding.com","http://macrumors.com/","https://moneySavingExpert.com","http://www.teamliquid.net/","http://neogaf.com/","http://2ch.net/","https://ubuntuforums.org/","http://www.thestudentroom.co.uk/","http://sherdog.com/","https://LinuxQuestions.org","http://www.healthboards.com/","http://airliners.net/","http://www.pokecommunity.com/","http://www.pprune.org/","https://bitcointalk.org","https://www.blackhatworld.com/","https://www.phpbb.com/","https://disqus.com/"]
+        self.combo_box.addItems(self.forum_list)
+        # creating push button
+        self.submit = QPushButton("add", self)
+        self.combo_box.adjustSize()
+        print(self.combo_box.count())
+ 
+        # adding action to button
+        self.submit.clicked.connect(self.pressed)
+        # setting geometry of the button
+        self.submit.setGeometry(200, 200, 200, 30)
+        print(self.con)
+    def pressed(self):
+        if self.con == 0:
+            self.main = Window()
+            self.con =+ 1
+        self.content = self.combo_box.currentText()
+        self.forum_list.remove(self.content)
+        self.main.url_parse(self.content)
+        self.hide()     
 
 class Window(QMainWindow):
 
     def __init__(self):
         super(Window, self).__init__()
         self.con = 0
+        self.con1 = 0
         self.initUI()
 
     def initUI(self):
@@ -121,7 +161,7 @@ class Window(QMainWindow):
         self.searchButton.setIconSize(QSize(30, 30))
         self.searchButton.setStyleSheet(
             "border-radius : 15; border : 0px solid black")
-
+        self.searchButton.clicked.connect(self.forums)
         #self.left_layout.addWidget(b3)
         self.uiBox.addWidget(self.addButton)
         self.uiBox.addWidget(self.minusButton)
@@ -193,6 +233,12 @@ class Window(QMainWindow):
         tab_icon.pop(ind)
         name = globals()[f'{name}']
         name.deleteLater()
+        
+    def forums(self):
+        if self.con1 == 0:
+            self.thewind=forumlist()
+            self.con1=+1
+        self.thewind.show()
 
     def create_button(self, name, url, action):
         path = GetIcon.download_favicon(url, name)
