@@ -24,8 +24,8 @@ def download_favicon(url, name):
         # MM end
         # TG start
         # checks if file already exists.
-        if os.path.isfile(os.getcwd() + "/Icons/" + name + '.ico'):
-            return "Icons/" + name + '.ico'
+        if os.path.isfile(os.getcwd() + "/Icons/" + str(name) + '.ico'):
+            return "Icons/" + str(name) + '.ico'
         #TG end
         # MM start
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -45,7 +45,7 @@ def download_favicon(url, name):
             #checks if ico link is valid
             if response.status_code == 200:
                 # generates full filepath for new icon file
-                icon_file = os.getcwd() + "/Icons/" + name + '.ico'
+                icon_file = os.getcwd() + "/Icons/" + str(name) + '.ico'
                 #writes content to file
                 with open(icon_file, 'wb') as f:
                     for chunk in response.iter_content(1024):
