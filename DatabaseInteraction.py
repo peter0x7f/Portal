@@ -8,24 +8,23 @@ import ForumClass
 # ForumURL - Text Not Null                                   Holds URL #
 # Icon - Text                             Holds file/filepath for file #
 # Name - Text                              Holds the name of the forum #
-"""
+
 #                            AllForums                                 #
 # URL - Text Not Null                                        Holds URL #
 
 
+# TG start
 def FindForums(cursor):
     allForumsFound = ScrapeForums()
     sites = [(s, ) for s in links]
     for item in sites:
         cursor.execute("INSERT INTO AllForums (URL) VALUES (?)", item)
-"""
-
-# TG start
 
 
 # returns a list of all forum objects containing all the forums in the database
 def ReadInDB(cursor):
     forumList = []
+
     cursor.execute("SELECT * FROM Forums")
     inList = cursor.fetchall()
     for row in inList:
@@ -33,7 +32,7 @@ def ReadInDB(cursor):
     return forumList
 
 
-# adds a forum to the database
+# adds a forum to the database after checking if it already exists
 def AddForum(cursor, URL, path, name, connection):
     cursor.execute(
         "INSERT INTO Forums (ForumURL, Icon, Name) VALUES (?, ?, ?)",
@@ -46,10 +45,10 @@ def AddForum(cursor, URL, path, name, connection):
 def RemoveForum(cursor, URL, connection):
     cursor.execute("SELECT Icon FROM 'Forums' WHERE ForumURL = (?)", (URL, ))
     file = cursor.fetchall()
-    file = file[0]
-    # checks if icon exists and is not default.
-    if len(file) > 0 and file[0] != "Icons/Default.png":
-        os.remove(file[0])
+    if len(file) > 0:
+        file = file[0]
+        if file[0] != "Icons/Default.png":
+            os.remove(file[0])
     cursor.execute("DELETE FROM 'Forums' WHERE ForumURL = ?", (URL, ))
     connection.commit()
 
