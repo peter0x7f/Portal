@@ -1,22 +1,24 @@
+# import necessary pyqt5 libraries
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
+# import other required libraries
 import sys
 import os
 import sqlite3
 import requests
 import atexit
 
+# import files
 import DatabaseInteraction
 import GetIcon
 import ForumClass
 
 # TG start
-# connects the the database, validates connection, and creates a cursor
+# connect to the database check for connection and create a cursor
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
@@ -25,9 +27,13 @@ else:
     msg.setWindowTitle("Database Error")
     msg.setText("Unable to connect with the database.")
     x = msg.exec_()
+    if returnValue == QMessageBox.Ok:
+        sys.exit()
+
 # TG end
 
 # MM start
+
 #set arrays global to be accessed from other classes without making removeItem child
 global tab_name
 global tab_link
@@ -37,7 +43,7 @@ tab_link = []
 tab_icon = []
 
 
-# class for remove forum feature
+# class to implement remove functionality
 class removeItem(QMainWindow):
 
     def __init__(self):
@@ -63,12 +69,14 @@ class removeItem(QMainWindow):
         # creating push button
         self.submit = QPushButton("submit", self)
 
+        print(self.combo_box.count())
+
         # adding action to button
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
+        print(self.con)
 
-    # method to connect button click to main functionality
     def pressed(self):
         if self.con == 0:
             self.main = Window()
@@ -79,12 +87,17 @@ class removeItem(QMainWindow):
         self.hide()
 
 
-"""
-# class to assist in forum search feature.
-class forumlist(QMainWindow):
+# MM end
+
+# MM start
+
+
+# class to implement forum search functionality
+class forumlist(QWidget):
 
     def __init__(self):
         super(forumlist, self).__init__()
+        self.added = 0
 
         # setting title
         self.setWindowTitle("Forum List")
@@ -105,47 +118,56 @@ class forumlist(QMainWindow):
         # adding list of items to combo box
         self.forum_list = [
             "https://www.reddit.com/", "https://forums.craigslist.org/",
-            "https://www.quora.com/", "http://stackoverflow.com/",
-            "https://gamefaqs.gamespot.com/", "http://tianya.cn/",
-            "http://ign.com/boards", "http://4chan.org/",
-            "https://www.ultimate-guitar.com/",
+            "https://www.quora.com/", "https://stackoverflow.com/",
+            "https://gamefaqs.gamespot.com/", "https://ign.com/boards",
+            "https://4chan.org/", "https://www.ultimate-guitar.com/",
             "https://www.xda-developers.com/", "https://hackforums.net/",
-            "https://darkode.market/", "http://slickdeals.net/",
-            "http://www.kaskus.co.id/", "http://arstechnica.com/",
-            "https://bodybuilding.com", "http://macrumors.com/",
-            "https://moneySavingExpert.com", "http://www.teamliquid.net/",
-            "http://neogaf.com/", "http://2ch.net/",
-            "https://ubuntuforums.org/", "http://www.thestudentroom.co.uk/",
-            "http://sherdog.com/", "https://LinuxQuestions.org",
-            "http://www.healthboards.com/", "http://airliners.net/",
-            "http://www.pokecommunity.com/", "http://www.pprune.org/",
+            "https://slickdeals.net/", "https://arstechnica.com/",
+            "https://macrumors.com/", "https://www.teamliquid.net/",
+            "https://neogaf.com/", "https://ubuntuforums.org/",
+            "https://www.thestudentroom.co.uk/", "https://sherdog.com/",
+            "https://www.healthboards.com/", "https://airliners.net/",
+            "https://www.pokecommunity.com/", "https://www.pprune.org/",
             "https://bitcointalk.org", "https://www.blackhatworld.com/",
             "https://www.phpbb.com/", "https://disqus.com/"
         ]
-        if self.con == 0:
-            for item in self.forum_list:
-                if item in tab_link:
-                    self.forum_list.remove(item)
+
+        # remove forums from forum_list which are already found.
+        for item in tab_link:
+            if item in self.forum_list:
+                self.forum_list.remove(item)
+
+            elif (item + '/') in self.forum_list:
+                self.forum_list.remove(item + "/")
+
         self.combo_box.addItems(self.forum_list)
         # creating push button
         self.submit = QPushButton("add", self)
         self.combo_box.adjustSize()
+        print(self.combo_box.count())
 
         # adding action to button
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
+        print(self.con)
 
     def pressed(self):
         if self.con == 0:
             self.main = Window()
             self.con = +1
-        self.content = self.combo_box.currentText()
-        self.forum_list.remove(self.content)
-        self.main.pass_args(self.content)
-        self.combo_box.clear()
-        self.hide()
-"""
+        if self.added != len(self.forum_list):
+            self.content = self.combo_box.currentText()
+            self.added += 1
+            self.forum_list.remove(self.content)
+            ex.url_parse(self.content)
+            self.combo_box.clear()
+            self.hide()
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle(":/")
+            msg.setText("No Forum Selected")
+            x = msg.exec_()
 
 
 class Window(QMainWindow):
@@ -156,6 +178,7 @@ class Window(QMainWindow):
         self.con1 = 0
         self.initUI()
 
+    # sets up ui.
     def initUI(self):
         self.setStyleSheet("background-color: #525252;")
         self.theapp = QApplication(['', '--no-sandbox'])
@@ -179,7 +202,6 @@ class Window(QMainWindow):
         # MM end
         # TG start
 
-        # horizontal layout to hold ui buttons
         self.uiBox = QHBoxLayout()
 
         # add forum button
@@ -199,20 +221,18 @@ class Window(QMainWindow):
         self.minusButton.clicked.connect(self.delet)
         self.minusButton.clicked.connect(self.ui1)
 
-        # the forum search feature is broken for some reason and we are debugging
-        """
+        # search for forums button
         self.searchButton = QPushButton("", self)
         self.searchButton.setIcon(QIcon("UI_Icons/SearchButton.png"))
         self.searchButton.setIconSize(QSize(30, 30))
         self.searchButton.setStyleSheet(
             "border-radius : 15; border : 0px solid black")
         self.searchButton.clicked.connect(self.forums)
-        """
 
         # add buttons to the horizontal box widget
         self.uiBox.addWidget(self.addButton)
         self.uiBox.addWidget(self.minusButton)
-        #self.uiBox.addWidget(self.searchButton)
+        self.uiBox.addWidget(self.searchButton)
 
         # make left_layout scrollable and add the uiBox to it.
         self.left_layout.addLayout(self.uiBox)
@@ -226,6 +246,7 @@ class Window(QMainWindow):
         self.right_widget = QTabWidget()
         self.right_widget.tabBar().setObjectName("mainTab")
 
+        # add tab to right widget
         self.right_widget.addTab(self.tab1, '')
         self.right_widget.setCurrentIndex(0)
         self.right_widget.setStyleSheet('''QTabBar::tab{width: 0; \
@@ -240,29 +261,37 @@ class Window(QMainWindow):
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
+        # MM end
+
+        # TG start
+        # read in the database if the lists are empty
         if len(tab_link) == 0 and len(tab_name) == 0:
             forumList = DatabaseInteraction.ReadInDB(cursor)
             for item in forumList:
                 self.create_button(item.name, item.URL, 1)
+        # TG end
 
-    # sets the main page to the homepage html file
+    # MM start
+    # set initial view to Home.html
     def ui1(self):
         self.mainurl.load(QtCore.QUrl.fromLocalFile(os.getcwd() +
                                                     '/Home.html'))
         return self.mainurl
 
-    # popup called by the add forum button
+    # opens popup window to input the url
     def popup(self):
         urldialog, ok = self.geturl.getText(self, "Add Forum", "Enter Url:")
         if ok:
             self.seturl.setText(urldialog)
             self.url_parse(self.seturl.text())
 
-    # helper function to delete forums
+    # helper function to remove items from the buttons, list
     def delet(self):
+        print(tab_name)
         if len(tab_name) >= 1:
             if self.con == 0:
                 self.thewindow = removeItem()
+                self.closeEvent
                 self.con = +1
             self.thewindow.combo_box.addItems(tab_name)
             self.thewindow.show()
@@ -272,49 +301,47 @@ class Window(QMainWindow):
             msg.setText("You have nothing to manage yet")
             x = msg.exec_()
 
-    # removes the widget and forum from lists when removing forums
-    def removewidget(self, name):
+    # MM end
 
-        ind = tab_name.index(name)
+    # TG start
+    def closeEvent(self, event):
+        app.quit()
 
-        # removes forum from buttons, database, and lists
-        DatabaseInteraction.RemoveForum(cursor, tab_link[ind], connection)
-        tab_name.pop(ind)
-        tab_link.pop(ind)
-        tab_icon.pop(ind)
-        name = globals()[f'{name}']
-        name.deleteLater()
+    # TG end
 
-    """ 
-    # part of the forum search feature
+    # MM start
     def forums(self):
         if self.con1 == 0:
             self.thewind = forumlist()
+
             self.con1 = +1
         self.thewind.combo_box.addItems(self.thewind.forum_list)
         self.thewind.show()
-    
 
-    def pass_args(self, url):
-        self.url_parse(url)
-    """
+    # removes the button, removes from list, and deletes from database
+    def removewidget(self, name):
+        ind = tab_name.index(name)
 
-    # MM end
-    # TG start
-    # dynamically creates buttons, if they are new adds them to the database, and downloads their icon.
+        # removes from database
+        DatabaseInteraction.RemoveForum(cursor, tab_link[ind], connection)
+
+        # deletes from list
+        tab_name.pop(ind)
+        tab_link.pop(ind)
+        tab_icon.pop(ind)
+
+        # deletes button.
+        name = globals()[f'{name}']
+        name.deleteLater()
+
     def create_button(self, name, url, action):
         path = GetIcon.download_favicon(url, name)
         if action == 0:
             DatabaseInteraction.AddForum(cursor, url, path, name, connection)
-# TG end
-# MM start
-# add the forum to the lists
         tab_name.append(name.lower())
         tab_link.append(url.lower())
         tab_icon.append(path)
         self.temp = len(tab_name)
-
-        # creates the button, sets size, icon, and connects a function
         globals()[f'{name}'] = QPushButton(name, self)
         globals()[f'{name}'].setStyleSheet(
             "border-radius : 25; border : 0px solid black")
@@ -324,7 +351,6 @@ class Window(QMainWindow):
         globals()[f'{name}'].clicked.connect(
             lambda: self.mainurl.setUrl(QtCore.QUrl(f'{url}')))
 
-    # parses the url and calls create_button.
     @pyqtSlot()
     def url_parse(self, urlval):
 
@@ -359,9 +385,10 @@ class Window(QMainWindow):
                     name = name[1][:]
                 #call create button class
             response.close()
-            if url not in tab_link or url.lower() not in tab_link:
+            if url not in tab_link:
                 self.create_button(name, url, 0)
             else:
+
                 msg = QMessageBox()
                 msg.setWindowTitle("Invalid input")
                 msg.setText("You have already entered this URL")
@@ -372,19 +399,18 @@ class Window(QMainWindow):
             msg.setWindowTitle("Invalid input")
             msg.setText("The URL you entered is invalid, please try again.")
             x = msg.exec_()
+        # MM end
 
 
-# MM end
-
-# MM started this function, TG added to it.
-# looks messy atexit functions clean up application
+# MM started but TG debugged and added to the function
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+
     atexit.register(app.deleteLater)
     ex = Window()
     atexit.register(DatabaseInteraction.BreakConnection, cursor, connection)
+    atexit.register(ex.deleteLater)
     ex.show()
     sys.exit(app.exec_())
-    atexit.register(ex.deleteLater)
     atexit.register(os.exit)
     sys.exit()
