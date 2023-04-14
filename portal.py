@@ -19,6 +19,8 @@ import ForumClass
 
 # TG start
 # connect to the database check for connection and create a cursor
+global connection
+global cursor
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
@@ -133,12 +135,12 @@ class forumlist(QWidget):
         ]
 
         # remove forums from forum_list which are already found.
-        for item in tab_link:
-            if item in self.forum_list:
-                self.forum_list.remove(item)
+        #for item in tab_link:
+        #    if item in self.forum_list:
+        #        self.forum_list.remove(item)
 
-            elif (item + '/') in self.forum_list:
-                self.forum_list.remove(item + "/")
+        #    elif (item + '/') in self.forum_list:
+        #        self.forum_list.remove(item + "/")
 
         self.combo_box.addItems(self.forum_list)
         # creating push button
@@ -158,7 +160,7 @@ class forumlist(QWidget):
         if self.added != len(self.forum_list):
             self.content = self.combo_box.currentText()
             self.added += 1
-            self.forum_list.remove(self.content)
+            #self.forum_list.remove(self.content)
             ex.url_parse(self.content)
             self.combo_box.clear()
             self.hide()
@@ -179,7 +181,7 @@ class Window(QMainWindow):
 
     # sets up ui.
     def initUI(self):
-        self.setStyleSheet("background-color: #423F3E;")  # 525252;")
+        self.setStyleSheet("background-color: #423F3E;")
         self.theapp = QApplication(['', '--no-sandbox'])
         self.mainurl = QWebEngineView()
         # set the title of main window
@@ -288,11 +290,11 @@ class Window(QMainWindow):
     def delet(self):
         if len(tab_name) >= 1:
             if self.con == 0:
-                self.thewindow = removeItem()
+                self.remforum = removeItem()
                 self.closeEvent
                 self.con = +1
-            self.thewindow.combo_box.addItems(tab_name)
-            self.thewindow.show()
+            self.remforum.combo_box.addItems(tab_name)
+            self.remforum.show()
         else:
             msg = QMessageBox()
             msg.setWindowTitle(":/")
@@ -304,17 +306,18 @@ class Window(QMainWindow):
     # TG start
     def closeEvent(self, event):
         try:
-            if ex.thewindow.main.isWindow():
-                ex.thewindow.destroy(True, True)
-            ex.thewindow.close()
+            if ex.remforum.main.isWindow():
+                ex.remforum.destroy(True, True)
+            ex.remforum.close()
         except:
-            print("",end='')
+            pass
         try:
-            if ex.thewind.main.isWindow():
-                ex.thewind.destroy(True, True)
-            ex.thewind.close()
+            if ex.searchforum.main.isWindow():
+                ex.searchforum.destroy(True, True)
+            ex.searchforum.close()
         except:
-            print("thewind")
+            pass
+        #app.quit()
         os._exit(os.EX_OK)
 
     # TG end
@@ -322,11 +325,11 @@ class Window(QMainWindow):
     # MM start
     def forums(self):
         if self.con1 == 0:
-            self.thewind = forumlist()
+            self.searchforum = forumlist()
 
             self.con1 = +1
-        self.thewind.combo_box.addItems(self.thewind.forum_list)
-        self.thewind.show()
+        self.searchforum.combo_box.addItems(self.searchforum.forum_list)
+        self.searchforum.show()
 
     # removes the button, removes from list, and deletes from database
     def removewidget(self, name):
@@ -347,8 +350,9 @@ class Window(QMainWindow):
     def create_button(self, name, url, action):
         path = GetIcon.download_favicon(url, name)
         if action == 0:
-            DatabaseInteraction.AddForum(cursor, url, path, name, connection)
-        tab_name.append(name.lower())
+            DatabaseInteraction.AddForum(cursor, url, path, str(name),
+                                         connection)
+        tab_name.append(str(name).lower())
         tab_link.append(url)
         tab_icon.append(path)
         self.temp = len(tab_name)
