@@ -315,7 +315,7 @@ class Window(QMainWindow):
             ex.thewind.close()
         except:
             print("thewind")
-        app.quit()
+        os._exit(os.EX_OK)
 
     # TG end
 
