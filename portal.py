@@ -42,7 +42,7 @@ tab_name = []
 tab_link = []
 tab_icon = []
 
-# MM created 2 classes TG combined them to avoid Crashing
+
 # class to allow the popup windows without it being a child class.
 # required to be in one class to avoid segfault
 class RemoveNSearch(QWidget):
@@ -54,12 +54,21 @@ class RemoveNSearch(QWidget):
         self.setGeometry(100, 100, 600, 400)
         self.added = 0
         self.con = 0
+        # removes the red 'x' button on window to avoid deleting the QWidget
+        self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint
+                            | Qt.WindowMinMaxButtonsHint)
+
+        # for regularity the search function is loaded.
         self.setToolTip("Use the dropdown menu to search a list of forums.")
         # setting title
         self.setWindowTitle("Forum List")
         self.con = 0
         # calling method
         self.UiSearch()
+        self.cancel = QPushButton("cancel", self)
+        self.cancel.clicked.connect(self.CancelAction)
+        # setting geometry of the button
+        self.cancel.setGeometry(150, 200, 100, 30)
 
     # creates window contents for remove feature
     def UiRemove(self):
@@ -67,7 +76,7 @@ class RemoveNSearch(QWidget):
 
         # setting geometry of combo box
         self.combo_box.setGeometry(200, 150, 120, 30)
-
+        self.combo_box.adjustSize()
         # adding list of items to combo box
         # creating push button
         self.submit = QPushButton("submit", self)
@@ -75,7 +84,7 @@ class RemoveNSearch(QWidget):
         # adding action to button
         self.submit.clicked.connect(self.PressRemove)
         # setting geometry of the button
-        self.submit.setGeometry(200, 200, 200, 30)
+        self.submit.setGeometry(300, 200, 100, 30)
 
     # creates window contents for search feature
     def UiSearch(self):
@@ -117,13 +126,17 @@ class RemoveNSearch(QWidget):
         # adding action to button
         self.submit.clicked.connect(self.PressSearch)
         # setting geometry of the button
-        self.submit.setGeometry(200, 200, 200, 30)
+        self.submit.setGeometry(400, 200, 100, 30)
+
+    def CancelAction(self):
+        self.hide()
 
     # function to add functionality to the remove button.
     def PressRemove(self):
         if self.con == 0:
             self.main = Window()
             self.main.setAttribute(Qt.WA_AlwaysShowToolTips)
+            self.main.setAttribute(Qt.WA_QuitOnClose, False)
             self.con = +1
         self.content = self.combo_box.currentText()
         self.main.removewidget(self.content)
@@ -135,6 +148,7 @@ class RemoveNSearch(QWidget):
         if self.con == 0:
             self.main = Window()
             self.main.setAttribute(Qt.WA_AlwaysShowToolTips)
+            self.main.setAttribute(Qt.WA_QuitOnClose, False)
             self.con = +1
         if self.added != len(self.forum_list):
             self.content = self.combo_box.currentText()
@@ -265,7 +279,11 @@ class Window(QMainWindow):
         # MM end
 
         # TG start
+
+        # creates the popup window
         self.PopupWindow = RemoveNSearch()
+        self.PopupWindow.hide()
+
         # read in the database if the lists are empty
         if len(tab_link) == 0 and len(tab_name) == 0:
             forumList = DatabaseInteraction.ReadInDB(cursor)
@@ -289,8 +307,13 @@ class Window(QMainWindow):
 
     # helper function to remove items from the buttons, list
     def delet(self):
+        try:
+            self.PopupWindow
+        except:
+            self.PopupWindow = RemoveNSearch()
         if len(tab_name) >= 1:
             if self.con == 0:
+
                 self.PopupWindow.ChangeType(0)
                 self.closeEvent
                 self.con = +1
