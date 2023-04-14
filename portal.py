@@ -42,25 +42,27 @@ tab_name = []
 tab_link = []
 tab_icon = []
 
+# MM created 2 classes TG combined them to avoid Crashing
+# class to allow the popup windows without it being a child class.
+# required to be in one class to avoid segfault
+class RemoveNSearch(QWidget):
 
-# class to implement remove functionality
-class removeItem(QWidget):
-
+    # instantiates the window
     def __init__(self):
-        super(removeItem, self).__init__()
+        super(RemoveNSearch, self).__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setToolTip("Use the dropdown menu to remove a saved forum.")
-        # setting title
-        self.setWindowTitle("Manage")
-        self.con = 0
-        # setting geometry
         self.setGeometry(100, 100, 600, 400)
+        self.added = 0
+        self.con = 0
+        self.setToolTip("Use the dropdown menu to search a list of forums.")
+        # setting title
+        self.setWindowTitle("Forum List")
+        self.con = 0
         # calling method
-        self.UiComponents()
+        self.UiSearch()
 
-    # method for widgets
-    def UiComponents(self):
-        # creating a combo box widget
+    # creates window contents for remove feature
+    def UiRemove(self):
         self.combo_box = QComboBox(self)
 
         # setting geometry of combo box
@@ -71,44 +73,12 @@ class removeItem(QWidget):
         self.submit = QPushButton("submit", self)
 
         # adding action to button
-        self.submit.clicked.connect(self.pressed)
+        self.submit.clicked.connect(self.PressRemove)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
 
-    def pressed(self):
-        if self.con == 0:
-            self.main = Window()
-            self.main.setAttribute(Qt.WA_AlwaysShowToolTips)
-            self.con = +1
-        self.content = self.combo_box.currentText()
-        self.main.removewidget(self.content)
-        self.combo_box.clear()
-        self.hide()
-
-
-# MM end
-
-# MM start
-
-
-# class to implement forum search functionality
-class forumlist(QWidget):
-
-    def __init__(self):
-        super(forumlist, self).__init__()
-        self.added = 0
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setToolTip("Use the dropdown menu to search a list of forums.")
-        # setting title
-        self.setWindowTitle("Forum List")
-        self.con = 0
-        # setting geometry
-        self.setGeometry(100, 100, 600, 400)
-        # calling method
-        self.UiComponents()
-
-    # method for widgets
-    def UiComponents(self):
+    # creates window contents for search feature
+    def UiSearch(self):
         # creating a combo box widget
         self.combo_box = QComboBox(self)
 
@@ -136,7 +106,6 @@ class forumlist(QWidget):
         for item in tab_link:
             if item in self.forum_list:
                 self.forum_list.remove(item)
-
             elif (item + '/') in self.forum_list:
                 self.forum_list.remove(item + "/")
 
@@ -146,11 +115,23 @@ class forumlist(QWidget):
         self.combo_box.adjustSize()
 
         # adding action to button
-        self.submit.clicked.connect(self.pressed)
+        self.submit.clicked.connect(self.PressSearch)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
 
-    def pressed(self):
+    # function to add functionality to the remove button.
+    def PressRemove(self):
+        if self.con == 0:
+            self.main = Window()
+            self.main.setAttribute(Qt.WA_AlwaysShowToolTips)
+            self.con = +1
+        self.content = self.combo_box.currentText()
+        self.main.removewidget(self.content)
+        self.combo_box.clear()
+        self.hide()
+
+    # function to add functionality to search button.
+    def PressSearch(self):
         if self.con == 0:
             self.main = Window()
             self.main.setAttribute(Qt.WA_AlwaysShowToolTips)
@@ -167,6 +148,27 @@ class forumlist(QWidget):
             msg.setWindowTitle(":/")
             msg.setText("No Forum Selected")
             x = msg.exec_()
+
+    # function to change window contents
+    def ChangeType(self, type):
+        # clears reused variables
+        self.combo_box.close()
+        self.submit.close()
+
+        if type == 0:
+            # changes the contents to remove functionality
+            self.setWindowTitle("Manage")
+            self.setToolTip("Use the dropdown menu to remove a saved forum.")
+            self.UiRemove()
+        else:
+            # changes the contents to the search functionality
+            self.setToolTip(
+                "Use the dropdown menu to search a list of forums.")
+            # setting title
+            self.setWindowTitle("Forum List")
+            self.con = 0
+            # calling method
+            self.UiSearch()
 
 
 class Window(QMainWindow):
@@ -263,6 +265,7 @@ class Window(QMainWindow):
         # MM end
 
         # TG start
+        self.PopupWindow = RemoveNSearch()
         # read in the database if the lists are empty
         if len(tab_link) == 0 and len(tab_name) == 0:
             forumList = DatabaseInteraction.ReadInDB(cursor)
@@ -288,11 +291,11 @@ class Window(QMainWindow):
     def delet(self):
         if len(tab_name) >= 1:
             if self.con == 0:
-                self.thewindow = removeItem()
+                self.PopupWindow.ChangeType(0)
                 self.closeEvent
                 self.con = +1
-            self.thewindow.combo_box.addItems(tab_name)
-            self.thewindow.show()
+            self.PopupWindow.combo_box.addItems(tab_name)
+            self.PopupWindow.show()
         else:
             msg = QMessageBox()
             msg.setWindowTitle(":/")
@@ -304,17 +307,11 @@ class Window(QMainWindow):
     # TG start
     def closeEvent(self, event):
         try:
-            if ex.thewindow.main.isWindow():
-                ex.thewindow.destroy(True, True)
-            ex.thewindow.close()
+            if ex.PopupWindow.main.isWindow():
+                ex.PopupWindow.destroy(True, True)
+            ex.PopupWindow.close()
         except:
-            print("",end='')
-        try:
-            if ex.thewind.main.isWindow():
-                ex.thewind.destroy(True, True)
-            ex.thewind.close()
-        except:
-            print("thewind")
+            print("PopupWindow")
         app.quit()
 
     # TG end
@@ -322,11 +319,11 @@ class Window(QMainWindow):
     # MM start
     def forums(self):
         if self.con1 == 0:
-            self.thewind = forumlist()
+            self.PopupWindow.ChangeType(1)
 
             self.con1 = +1
-        self.thewind.combo_box.addItems(self.thewind.forum_list)
-        self.thewind.show()
+        self.PopupWindow.combo_box.addItems(self.PopupWindow.forum_list)
+        self.PopupWindow.show()
 
     # removes the button, removes from list, and deletes from database
     def removewidget(self, name):
