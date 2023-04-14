@@ -14,11 +14,6 @@ import ForumClass
 
 
 # TG start
-def FindForums(cursor):
-    allForumsFound = ScrapeForums()
-    sites = [(s, ) for s in links]
-    for item in sites:
-        cursor.execute("INSERT INTO AllForums (URL) VALUES (?)", item)
 
 
 # returns a list of all forum objects containing all the forums in the database
