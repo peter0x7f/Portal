@@ -19,6 +19,7 @@ import ForumClass
 
 # TG start
 # connect to the database check for connection and create a cursor
+global connection,cursor
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
@@ -383,8 +384,6 @@ class Window(QMainWindow):
 
     def create_button(self, name, url, action):
         path = GetIcon.download_favicon(url, name)
-        if action == 0:
-            DatabaseInteraction.AddForum(cursor, url, path, name, connection)
         tab_name.append(name.lower())
         tab_link.append(url)
         tab_icon.append(path)
@@ -399,6 +398,8 @@ class Window(QMainWindow):
 
             globals()[f'{name}'].clicked.connect(
                 lambda: self.mainurl.setUrl(QtCore.QUrl(f'{url}')))
+            if action == 0:
+                DatabaseInteraction.AddForum(cursor, url, path, name, connection)
         except:
             print("button err")
             #pass
