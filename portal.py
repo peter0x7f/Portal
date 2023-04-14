@@ -1,3 +1,10 @@
+"""
+Program: Portal.py
+Purpose: To allow the user to save websites by URL and search for forums.
+Date: 4/14/23
+Authors: Thomas Gallaher, Malcolm MacDonough
+"""
+
 # import necessary pyqt5 libraries
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import QWebEngineView
