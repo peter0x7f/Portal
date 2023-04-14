@@ -54,47 +54,15 @@ class RemoveNSearch(QWidget):
         self.setGeometry(100, 100, 600, 400)
         self.added = 0
         self.con = 0
+        self.submit = QPushButton("submit", self)
+        self.submit.hide()
+        self.add = QPushButton("Add", self)
+        self.add.hide()
+        self.combo_box = QComboBox(self)
         # removes the red 'x' button on window to avoid deleting the QWidget
         self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint
                             | Qt.WindowMinMaxButtonsHint)
 
-        # for regularity the search function is loaded.
-        self.setToolTip("Use the dropdown menu to search a list of forums.")
-        # setting title
-        self.setWindowTitle("Forum List")
-        self.con = 0
-        # calling method
-        self.UiSearch()
-        self.cancel = QPushButton("cancel", self)
-        self.cancel.clicked.connect(self.CancelAction)
-        # setting geometry of the button
-        self.cancel.setGeometry(150, 200, 100, 30)
-
-    # creates window contents for remove feature
-    def UiRemove(self):
-        self.combo_box = QComboBox(self)
-
-        # setting geometry of combo box
-        self.combo_box.setGeometry(200, 150, 120, 30)
-        self.combo_box.adjustSize()
-        # adding list of items to combo box
-        # creating push button
-        self.submit = QPushButton("submit", self)
-
-        # adding action to button
-        self.submit.clicked.connect(self.PressRemove)
-        # setting geometry of the button
-        self.submit.setGeometry(300, 200, 100, 30)
-
-    # creates window contents for search feature
-    def UiSearch(self):
-        # creating a combo box widget
-        self.combo_box = QComboBox(self)
-
-        # setting geometry of combo box
-        self.combo_box.setGeometry(200, 150, 120, 30)
-
-        # adding list of items to combo box
         self.forum_list = [
             "https://www.reddit.com/", "https://forums.craigslist.org/",
             "https://www.quora.com/", "https://stackoverflow.com/",
@@ -111,22 +79,62 @@ class RemoveNSearch(QWidget):
             "https://www.phpbb.com/", "https://disqus.com/"
         ]
 
-        # remove forums from forum_list which are already found.
+        # for regularity the search function is loaded.
+        self.setToolTip("Use the dropdown menu to search a list of forums.")
+        # setting title
+        self.setWindowTitle("Forum List")
+        self.con = 0
+        # calling method
+        self.UiSearch()
+        self.cancel = QPushButton("cancel", self)
+        self.cancel.clicked.connect(self.CancelAction)
+        # setting geometry of the button
+        self.cancel.setGeometry(150, 200, 100, 30)
+
+    # creates window contents for remove feature
+    def UiRemove(self):
+        #self.combo_box = QComboBox(self)
+
+        # setting geometry of combo box
+        self.combo_box.show()
+        self.combo_box.setGeometry(200, 150, 120, 30)
+        # adding list of items to combo box
+        # creating push button
+        #self.submit = QPushButton("submit", self)
+        self.submit.show()
+        self.submit.setText("submit")
+        # adding action to button
+
+        self.submit.clicked.connect(self.PressRemove)
+        # setting geometry of the button
+        #self.submit.setGeometry(300, 200, 100, 30)
+
+    # creates window contents for search feature
+    def UiSearch(self):
+        # creating a combo box widget
+        #self.combo_box = QComboBox(self)
+
+        # setting geometry of combo box
+        self.combo_box.show()
+        self.combo_box.setGeometry(200, 150, 120, 30)
+
+        # adding list of items to combo box
+        """# remove forums from forum_list which are already found.
         for item in tab_link:
             if item in self.forum_list:
                 self.forum_list.remove(item)
             elif (item + '/') in self.forum_list:
                 self.forum_list.remove(item + "/")
-
+        """
         self.combo_box.addItems(self.forum_list)
         # creating push button
-        self.submit = QPushButton("add", self)
+        self.add.show()
         self.combo_box.adjustSize()
 
         # adding action to button
-        self.submit.clicked.connect(self.PressSearch)
+        self.add.clicked.connect(self.PressSearch)
         # setting geometry of the button
-        self.submit.setGeometry(400, 200, 100, 30)
+        #self.add.setGeometry(400, 200, 100, 30)
 
     def CancelAction(self):
         self.hide()
@@ -139,6 +147,8 @@ class RemoveNSearch(QWidget):
             self.main.setAttribute(Qt.WA_QuitOnClose, False)
             self.con = +1
         self.content = self.combo_box.currentText()
+        #if self.content in tab_name:
+        #    self.forum_list.append(tab_link[tab_name.index(self.content)])
         self.main.removewidget(self.content)
         self.combo_box.clear()
         self.hide()
@@ -153,8 +163,9 @@ class RemoveNSearch(QWidget):
         if self.added != len(self.forum_list):
             self.content = self.combo_box.currentText()
             self.added += 1
-            self.forum_list.remove(self.content)
+            #self.forum_list.remove(self.content)
             ex.url_parse(self.content)
+            self.add.hide()
             self.combo_box.clear()
             self.hide()
         else:
@@ -163,18 +174,21 @@ class RemoveNSearch(QWidget):
             msg.setText("No Forum Selected")
             x = msg.exec_()
 
+    # TG start
     # function to change window contents
     def ChangeType(self, type):
         # clears reused variables
-        self.combo_box.close()
-        self.submit.close()
-
+        self.combo_box.clear()
         if type == 0:
+            self.add.setGeometry(900, 900, 100, 30)
+            self.submit.setGeometry(400, 200, 100, 30)
             # changes the contents to remove functionality
             self.setWindowTitle("Manage")
             self.setToolTip("Use the dropdown menu to remove a saved forum.")
             self.UiRemove()
         else:
+            self.add.setGeometry(400, 200, 100, 30)
+            self.submit.setGeometry(900, 900, 100, 30)
             # changes the contents to the search functionality
             self.setToolTip(
                 "Use the dropdown menu to search a list of forums.")
@@ -183,6 +197,8 @@ class RemoveNSearch(QWidget):
             self.con = 0
             # calling method
             self.UiSearch()
+
+    # TG end
 
 
 class Window(QMainWindow):
@@ -318,6 +334,7 @@ class Window(QMainWindow):
                 self.closeEvent
                 self.con = +1
             self.PopupWindow.combo_box.addItems(tab_name)
+            self.PopupWindow.combo_box.adjustSize()
             self.PopupWindow.show()
         else:
             msg = QMessageBox()
@@ -372,14 +389,19 @@ class Window(QMainWindow):
         tab_link.append(url)
         tab_icon.append(path)
         self.temp = len(tab_name)
-        globals()[f'{name}'] = QPushButton(name, self)
-        globals()[f'{name}'].setStyleSheet(
-            "border-radius : 25; border : 0px solid black")
-        globals()[f'{name}'].setIcon(QIcon(path))
-        globals()[f'{name}'].setIconSize(QSize(50, 50))
-        self.left_layout.addWidget(globals()[f'{name}'])
-        globals()[f'{name}'].clicked.connect(
-            lambda: self.mainurl.setUrl(QtCore.QUrl(f'{url}')))
+        try:
+            globals()[f'{name}'] = QPushButton(name, self)
+            globals()[f'{name}'].setStyleSheet(
+                "border-radius : 25; border : 0px solid black")
+            globals()[f'{name}'].setIcon(QIcon(path))
+            globals()[f'{name}'].setIconSize(QSize(50, 50))
+            self.left_layout.addWidget(globals()[f'{name}'])
+
+            globals()[f'{name}'].clicked.connect(
+                lambda: self.mainurl.setUrl(QtCore.QUrl(f'{url}')))
+        except:
+            print("button err")
+            #pass
 
     @pyqtSlot()
     def url_parse(self, urlval):
@@ -413,9 +435,9 @@ class Window(QMainWindow):
                 else:
                     name = name[0].split('://')
                     name = name[1][:]
-                #call create button class
             response.close()
             if url not in tab_link:
+                #call create button class
                 self.create_button(name, url, 0)
             else:
 
