@@ -34,7 +34,7 @@ else:
 
 # MM start
 
-#set arrays global to be accessed from other classes without making removeItem child
+# set arrays global to be accessed from other classes without making removeItem child
 global tab_name
 global tab_link
 global tab_icon
@@ -44,11 +44,12 @@ tab_icon = []
 
 
 # class to implement remove functionality
-class removeItem(QMainWindow):
+class removeItem(QWidget):
 
     def __init__(self):
         super(removeItem, self).__init__()
-
+        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setToolTip("Use the dropdown menu to remove a saved forum.")
         # setting title
         self.setWindowTitle("Manage")
         self.con = 0
@@ -69,17 +70,15 @@ class removeItem(QMainWindow):
         # creating push button
         self.submit = QPushButton("submit", self)
 
-        print(self.combo_box.count())
-
         # adding action to button
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
-        print(self.con)
 
     def pressed(self):
         if self.con == 0:
             self.main = Window()
+            self.main.setAttribute(Qt.WA_AlwaysShowToolTips)
             self.con = +1
         self.content = self.combo_box.currentText()
         self.main.removewidget(self.content)
@@ -98,7 +97,8 @@ class forumlist(QWidget):
     def __init__(self):
         super(forumlist, self).__init__()
         self.added = 0
-
+        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setToolTip("Use the dropdown menu to search a list of forums.")
         # setting title
         self.setWindowTitle("Forum List")
         self.con = 0
@@ -144,17 +144,16 @@ class forumlist(QWidget):
         # creating push button
         self.submit = QPushButton("add", self)
         self.combo_box.adjustSize()
-        print(self.combo_box.count())
 
         # adding action to button
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
         self.submit.setGeometry(200, 200, 200, 30)
-        print(self.con)
 
     def pressed(self):
         if self.con == 0:
             self.main = Window()
+            self.main.setAttribute(Qt.WA_AlwaysShowToolTips)
             self.con = +1
         if self.added != len(self.forum_list):
             self.content = self.combo_box.currentText()
@@ -180,7 +179,7 @@ class Window(QMainWindow):
 
     # sets up ui.
     def initUI(self):
-        self.setStyleSheet("background-color: #525252;")
+        self.setStyleSheet("background-color: #423F3E;")  # 525252;")
         self.theapp = QApplication(['', '--no-sandbox'])
         self.mainurl = QWebEngineView()
         # set the title of main window
@@ -287,7 +286,6 @@ class Window(QMainWindow):
 
     # helper function to remove items from the buttons, list
     def delet(self):
-        print(tab_name)
         if len(tab_name) >= 1:
             if self.con == 0:
                 self.thewindow = removeItem()
@@ -305,6 +303,18 @@ class Window(QMainWindow):
 
     # TG start
     def closeEvent(self, event):
+        try:
+            if ex.thewindow.main.isWindow():
+                ex.thewindow.destroy(True, True)
+            ex.thewindow.close()
+        except:
+            print("",end='')
+        try:
+            if ex.thewind.main.isWindow():
+                ex.thewind.destroy(True, True)
+            ex.thewind.close()
+        except:
+            print("thewind")
         app.quit()
 
     # TG end
@@ -339,7 +349,7 @@ class Window(QMainWindow):
         if action == 0:
             DatabaseInteraction.AddForum(cursor, url, path, name, connection)
         tab_name.append(name.lower())
-        tab_link.append(url.lower())
+        tab_link.append(url)
         tab_icon.append(path)
         self.temp = len(tab_name)
         globals()[f'{name}'] = QPushButton(name, self)
@@ -406,11 +416,10 @@ class Window(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    atexit.register(app.deleteLater)
     ex = Window()
     atexit.register(DatabaseInteraction.BreakConnection, cursor, connection)
     atexit.register(ex.deleteLater)
+    atexit.register(app.deleteLater)
+
     ex.show()
     sys.exit(app.exec_())
-    atexit.register(os.exit)
-    sys.exit()
