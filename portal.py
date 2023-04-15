@@ -26,8 +26,6 @@ import ForumClass
 
 # TG start
 # connect to the database check for connection and create a cursor
-global connection
-global cursor
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
@@ -59,8 +57,14 @@ class removeItem(QWidget):
         super(removeItem, self).__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setToolTip("Use the dropdown menu to remove a saved forum.")
+        self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint
+                            | Qt.WindowMinMaxButtonsHint)
         # setting title
         self.setWindowTitle("Manage")
+        self.cancel = QPushButton("cancel", self)
+        self.cancel.clicked.connect(self.CancelAction)
+        # setting geometry of the button
+        self.cancel.setGeometry(150, 200, 100, 30)
         self.con = 0
         # setting geometry
         self.setGeometry(100, 100, 600, 400)
@@ -82,7 +86,7 @@ class removeItem(QWidget):
         # adding action to button
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
-        self.submit.setGeometry(200, 200, 200, 30)
+        self.submit.setGeometry(300, 200, 100, 30)
 
     def pressed(self):
         if self.con == 0:
@@ -92,6 +96,9 @@ class removeItem(QWidget):
         self.content = self.combo_box.currentText()
         self.main.removewidget(self.content)
         self.combo_box.clear()
+        self.hide()
+
+    def CancelAction(self):
         self.hide()
 
 
@@ -108,8 +115,14 @@ class forumlist(QWidget):
         self.added = 0
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setToolTip("Use the dropdown menu to search a list of forums.")
+        self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint
+                            | Qt.WindowMinMaxButtonsHint)
         # setting title
         self.setWindowTitle("Forum List")
+        self.cancel = QPushButton("cancel", self)
+        self.cancel.clicked.connect(self.CancelAction)
+        # setting geometry of the button
+        self.cancel.setGeometry(150, 200, 100, 30)
         self.con = 0
         # setting geometry
         self.setGeometry(100, 100, 600, 400)
@@ -142,12 +155,12 @@ class forumlist(QWidget):
         ]
 
         # remove forums from forum_list which are already found.
-        #for item in tab_link:
-        #    if item in self.forum_list:
-        #        self.forum_list.remove(item)
+        for item in tab_link:
+            if item in self.forum_list:
+                self.forum_list.remove(item)
 
-        #    elif (item + '/') in self.forum_list:
-        #        self.forum_list.remove(item + "/")
+            elif (item + '/') in self.forum_list:
+                self.forum_list.remove(item + "/")
 
         self.combo_box.addItems(self.forum_list)
         # creating push button
@@ -157,7 +170,7 @@ class forumlist(QWidget):
         # adding action to button
         self.submit.clicked.connect(self.pressed)
         # setting geometry of the button
-        self.submit.setGeometry(200, 200, 200, 30)
+        self.submit.setGeometry(300, 200, 100, 30)
 
     def pressed(self):
         if self.con == 0:
@@ -167,7 +180,7 @@ class forumlist(QWidget):
         if self.added != len(self.forum_list):
             self.content = self.combo_box.currentText()
             self.added += 1
-            #self.forum_list.remove(self.content)
+            self.forum_list.remove(self.content)
             ex.url_parse(self.content)
             self.combo_box.clear()
             self.hide()
@@ -176,6 +189,9 @@ class forumlist(QWidget):
             msg.setWindowTitle(":/")
             msg.setText("No Forum Selected")
             x = msg.exec_()
+
+    def CancelAction(self):
+        self.hide()
 
 
 class Window(QMainWindow):
@@ -297,11 +313,12 @@ class Window(QMainWindow):
     def delet(self):
         if len(tab_name) >= 1:
             if self.con == 0:
-                self.remforum = removeItem()
+                self.thewindow = removeItem()
                 self.closeEvent
                 self.con = +1
-            self.remforum.combo_box.addItems(tab_name)
-            self.remforum.show()
+            self.thewindow.combo_box.addItems(tab_name)
+            self.thewindow.combo_box.adjustSize()
+            self.thewindow.show()
         else:
             msg = QMessageBox()
             msg.setWindowTitle(":/")
@@ -313,18 +330,17 @@ class Window(QMainWindow):
     # TG start
     def closeEvent(self, event):
         try:
-            if ex.remforum.main.isWindow():
-                ex.remforum.destroy(True, True)
-            ex.remforum.close()
+            if ex.thewindow.main.isWindow():
+                ex.thewindow.destroy(True, True)
+            ex.thewindow.close()
         except:
             pass
         try:
-            if ex.searchforum.main.isWindow():
-                ex.searchforum.destroy(True, True)
-            ex.searchforum.close()
+            if ex.thewind.main.isWindow():
+                ex.thewind.destroy(True, True)
+            ex.thewind.close()
         except:
             pass
-        #app.quit()
         os._exit(os.EX_OK)
 
     # TG end
@@ -332,11 +348,11 @@ class Window(QMainWindow):
     # MM start
     def forums(self):
         if self.con1 == 0:
-            self.searchforum = forumlist()
+            self.thewind = forumlist()
 
             self.con1 = +1
-        self.searchforum.combo_box.addItems(self.searchforum.forum_list)
-        self.searchforum.show()
+        self.thewind.combo_box.addItems(self.thewind.forum_list)
+        self.thewind.show()
 
     # removes the button, removes from list, and deletes from database
     def removewidget(self, name):
@@ -357,9 +373,8 @@ class Window(QMainWindow):
     def create_button(self, name, url, action):
         path = GetIcon.download_favicon(url, name)
         if action == 0:
-            DatabaseInteraction.AddForum(cursor, url, path, str(name),
-                                         connection)
-        tab_name.append(str(name).lower())
+            DatabaseInteraction.AddForum(cursor, url, path, name, connection)
+        tab_name.append(name.lower())
         tab_link.append(url)
         tab_icon.append(path)
         self.temp = len(tab_name)
