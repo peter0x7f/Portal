@@ -108,10 +108,10 @@ class removeItem(QWidget):
 
 
 # class to implement forum search functionality
-class forumlist(QWidget):
+class searchForum(QWidget):
 
     def __init__(self):
-        super(forumlist, self).__init__()
+        super(searchForum, self).__init__()
         self.added = 0
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setToolTip("Use the dropdown menu to search a list of forums.")
@@ -348,7 +348,7 @@ class Window(QMainWindow):
     # MM start
     def forums(self):
         if self.con1 == 0:
-            self.searchPopup = forumlist()
+            self.searchPopup = searchForum()
 
             self.con1 = +1
         self.searchPopup.combo_box.addItems(self.searchPopup.forum_list)
