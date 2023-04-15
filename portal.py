@@ -292,7 +292,7 @@ class Window(QMainWindow):
         if len(tab_link) == 0 and len(tab_name) == 0:
             forumList = DatabaseInteraction.ReadInDB(cursor)
             for item in forumList:
-                self.create_button(item.name, item.URL, 1)
+                self.create_button(item.GetName(), item.GetUrl(), 1)
         # TG end
 
     # MM start
@@ -313,12 +313,12 @@ class Window(QMainWindow):
     def delet(self):
         if len(tab_name) >= 1:
             if self.con == 0:
-                self.thewindow = removeItem()
+                self.removePopup = removeItem()
                 self.closeEvent
                 self.con = +1
-            self.thewindow.combo_box.addItems(tab_name)
-            self.thewindow.combo_box.adjustSize()
-            self.thewindow.show()
+            self.removePopup.combo_box.addItems(tab_name)
+            self.removePopup.combo_box.adjustSize()
+            self.removePopup.show()
         else:
             msg = QMessageBox()
             msg.setWindowTitle(":/")
@@ -330,15 +330,15 @@ class Window(QMainWindow):
     # TG start
     def closeEvent(self, event):
         try:
-            if ex.thewindow.main.isWindow():
-                ex.thewindow.destroy(True, True)
-            ex.thewindow.close()
+            if ex.removePopup.main.isWindow():
+                ex.removePopup.destroy(True, True)
+            ex.removePopup.close()
         except:
             pass
         try:
-            if ex.thewind.main.isWindow():
-                ex.thewind.destroy(True, True)
-            ex.thewind.close()
+            if ex.searchPopup.main.isWindow():
+                ex.searchPopup.destroy(True, True)
+            ex.searchPopup.close()
         except:
             pass
         os._exit(os.EX_OK)
@@ -348,11 +348,11 @@ class Window(QMainWindow):
     # MM start
     def forums(self):
         if self.con1 == 0:
-            self.thewind = forumlist()
+            self.searchPopup = forumlist()
 
             self.con1 = +1
-        self.thewind.combo_box.addItems(self.thewind.forum_list)
-        self.thewind.show()
+        self.searchPopup.combo_box.addItems(self.searchPopup.forum_list)
+        self.searchPopup.show()
 
     # removes the button, removes from list, and deletes from database
     def removewidget(self, name):
