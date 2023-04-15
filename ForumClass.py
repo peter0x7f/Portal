@@ -5,26 +5,26 @@
 class forum:
 
     def __init__(self, URL, Icon, Name):
-        self.URL = URL
-        self.icon = Icon
-        self.name = Name
+        self.SetUrl(URL)
+        self.SetIcon(Icon)
+        self.SetName(Name)
 
-    def SetUrl(url):
+    def SetUrl(self, url):
         self.URL = url
 
-    def GetUrl():
+    def GetUrl(self):
         return self.URL
 
-    def SetIcon(icon):
+    def SetIcon(self, icon):
         self.icon = icon
 
-    def GetIcon():
+    def GetIcon(self):
         return self.icon
 
-    def SetName(name):
+    def SetName(self, name):
         self.name = name
 
-    def GetName():
+    def GetName(self):
         return self.name
 
 
