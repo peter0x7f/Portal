@@ -2,7 +2,7 @@
 Program: Portal.py
 Purpose: To allow the user to save websites by URL and search for forums.
 Date: 4/14/23
-Authors: Thomas Gallaher, Malcolm MacDonough
+Authors: Thomas Gallaher, Malcolm McDonough
 """
 
 # import necessary pyqt5 libraries
