@@ -30,6 +30,13 @@ import ForumClass
 connection = sqlite3.connect("PortalDB.db")
 if connection:
     cursor = connection.cursor()
+    try:
+        res = cursor.execute("SELECT * FROM Forums")
+        res.fetchall()
+    except:
+        cursor.execute(
+            "CREATE TABLE 'Forums' ('ForumURL' TEXT NOT NULL, 'Icon' TEXT DEFAULT 'UNSET', 'Name' TEXT);"
+        )
 else:
     msg = QMessageBox()
     msg.setWindowTitle("Database Error")
@@ -154,7 +161,7 @@ class searchForum(QWidget):
             "https://bitcointalk.org", "https://www.blackhatworld.com/",
             "https://www.phpbb.com/", "https://disqus.com/"
         ]
-
+        print(len(self.forum_list))
         # remove forums from forum_list which are already found.
         for item in tab_link:
             if item in self.forum_list:
