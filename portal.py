@@ -18,6 +18,7 @@ import os
 import sqlite3
 import requests
 import atexit
+import platform
 
 # import files
 import DatabaseInteraction
@@ -341,7 +342,10 @@ class Window(QMainWindow):
             ex.searchPopup.close()
         except:
             pass
-        os._exit(os.EX_OK)
+        if platform.system() == "Windows":
+            os._exit(os.X_OK)
+        else:
+            os._exit(os.EX_OK)
 
     # TG end
 
